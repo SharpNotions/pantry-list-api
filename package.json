@@ -1,0 +1,27 @@
+{
+  "name": "pantry-list-api",
+  "version": "1.0.0",
+  "repository": "https://github.com/SharpNotions/pantry-list-api.git",
+  "author": "Travis Stodter <travis.stodter@sharpnotions.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon ./src/app.js",
+    "test": "jest",
+    "test-watch": "jest --watch",
+    "pretty": "prettier --write --print-width 80 --single-quote --trailing-comma es5 --tab-width 2 'src/**/*.js' 'tests/**/*.js'"
+  },
+  "dependencies": {
+    "boom": "^7.2.0",
+    "dotenv": "^5.0.1",
+    "koa": "^2.5.0",
+    "koa-logger": "^3.2.0",
+    "koa-router": "^7.4.0",
+    "ramda": "^0.25.0"
+  },
+  "devDependencies": {
+    "jest": "^22.4.2",
+    "nodemon": "^1.17.2",
+    "prettier": "^1.11.1",
+    "sinon": "^4.4.5"
+  }
+}
