@@ -11,7 +11,7 @@ router
     ctx.body = 'Hello World';
   })
   .get('/ping', (ctx, next) => {
-    ctx.body = 'pong';
+    ctx.body = `pong ${new Date().toString()}`;
   });
 
 app.use(logger());
