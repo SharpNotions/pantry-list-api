@@ -19,6 +19,6 @@ app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-const port = process.env.PORT || process.env.LOCAL_PORT;
+const port = process.env.PORT || 4000;
 console.log(`Listening on port ${port}.`);
 app.listen(port);
