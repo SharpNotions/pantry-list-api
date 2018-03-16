@@ -5,7 +5,8 @@
   "author": "Travis Stodter <travis.stodter@sharpnotions.com>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --require dotenv/config ./src/app.js",
+    "start": "node --require dotenv/config ./src/app.js",
+    "start-dev": "nodemon --require dotenv/config ./src/app.js",
     "test": "jest",
     "test-watch": "jest --watch",
     "pretty": "prettier --write --print-width 80 --single-quote --trailing-comma es5 --tab-width 2 'src/**/*.js' 'tests/**/*.js'"
