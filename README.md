@@ -20,10 +20,11 @@ Heroku automatically:
 * Runs tests for any branch push.
 
 ## Docker
+https://hub.docker.com/r/sharpnotionsllc/pantry-list-api/
 
 1. copy your npmrc file to dir `cp ~/.npmrc .`
 
 ```bash
 docker-compose up
 ```
-* open [localhost:4000](localhost:4000)
+* open [localhost:4000](http://localhost:4000)
