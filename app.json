@@ -1,10 +1,13 @@
-"environments": {
-    "test": {
-      "formation": {
-          "test": {
-            "quantity": 1,
-            "size": "standard-1x"
-          }
-      }
-   }
+{
+  "name": "Pantry List API",
+  "environments": {
+      "test": {
+        "formation": {
+            "test": {
+              "quantity": 1,
+              "size": "standard-1x"
+            }
+        }
+     }
+  }
 }
