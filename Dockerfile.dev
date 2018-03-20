@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:8.9
 LABEL maintainer="contact@sharpnotions.com"
 
 ENV LANG=C.UTF-8 BIN_DIR=/usr/bin APP_DIR=/usr/src/app
