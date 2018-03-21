@@ -5,20 +5,25 @@ const CLIENT_ID =
 const client = new OAuth2Client(CLIENT_ID);
 
 const requireAuth = async (ctx, next) => {
+  ctx.assert(ctx.header.authorization, 401, 'No auth header found.');
   const [_, idToken] = ctx.header.authorization.split(' ');
-  const ticket = await client.verifyIdToken({
-    idToken,
-    audience: CLIENT_ID,
-  });
-  const payload = ticket.getPayload();
-  if (payload.hd === 'sharpnotions.com') {
+  ctx.assert(idToken, 401, 'ID token not found');
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    ctx.assert(payload.hd === 'sharpnotions.com', 401, 'Not authorized');
+
     await next();
-  } else {
+  } catch (err) {
     ctx.status = 401;
     ctx.body = {
-      errors: [{ title: 'Not authorized', status: 401 }],
+      errors: [err.message],
     };
-  }
+  };
 };
 
 module.exports = requireAuth;
