@@ -3,6 +3,7 @@ const Router     = require('koa-router');
 const logger     = require('koa-logger');
 const bodyParser = require('koa-bodyparser');
 const auth       = require('./auth');
+const R          = require('ramda');
 
 const app    = new Koa();
 const router = new Router();
