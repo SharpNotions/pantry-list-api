@@ -2,22 +2,30 @@ const sinon = require('sinon');
 const R     = require('ramda');
 
 describe('hello', () => {
+  let db;
   const hello = sinon.stub().returns('Hello, beautiful!');
 
+  beforeAll(() => {
+    db = require('../src/db/connection');
+  });
+
+  afterAll(() => {
+    db.destroy();
+  });
+
+  beforeEach(async () => {
+    await db.migrate.rollback();
+    await db.migrate.latest();
+  });
+
   it('should say hello', () => {
-    console.log('ENV', process.env.NODE_ENV);
+    expect(hello()).toBe('Hello, beautiful!');
+  });
 
+  it('should connect to db', async () => {
+    const res = await db.raw('SELECT table_name FROM information_schema.tables;');
 
-    const conn = require('../src/db/connection');
-
-    return (async () => {
-      const res = await conn.raw('SELECT table_schema,table_name FROM information_schema.tables;');
-      R.forEach(R.pipe(JSON.stringify, console.log), res.rows);
-
-      expect(hello()).toBe('Hello, beautiful!');
-
-    })();
-
-
+    expect(res).toHaveProperty('rows');
+    expect(res.rows.length).toBeGreaterThan(0);
   });
 });

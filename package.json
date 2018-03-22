@@ -9,7 +9,10 @@
     "start-dev": "nodemon ./src/app.js",
     "test": "jest",
     "test-watch": "jest --watch",
-    "pretty": "prettier --write --print-width 80 --single-quote --trailing-comma es5 --tab-width 2 'src/**/*.js' 'tests/**/*.js'"
+    "pretty": "prettier --write --print-width 80 --single-quote --trailing-comma es5 --tab-width 2 'src/**/*.js' 'tests/**/*.js'",
+    "create-migration": "knex migrate:make",
+    "migrate": "knex migrate:latest",
+    "migrate-rollback": "knex migrate:rollback"
   },
   "dependencies": {
     "boom": "^7.2.0",
