@@ -28,3 +28,29 @@ https://hub.docker.com/r/sharpnotionsllc/pantry-list-api/
 docker-compose up
 ```
 * open [localhost:4000](http://localhost:4000)
+
+## Database Miscellanea
+
+For developing against a local db:
+```
+psql
+CREATE DATABASE pantry_list;
+CREATE DATABASE pantry_list_test;
+```
+
+### Create migration
+```
+yarn create-migration -- <migration name>
+```
+
+### Run migrations
+```
+yarn migrate
+
+yarn migrate -- --env test
+```
+
+### Rollback migrations
+```
+yarn migrate-rollback
+```

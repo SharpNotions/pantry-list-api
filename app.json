@@ -2,6 +2,7 @@
   "name": "Pantry List API",
   "environments": {
       "test": {
+        "addons": ["heroku-postgresql:in-dyno"],
         "formation": {
             "test": {
               "quantity": 1,
@@ -9,5 +10,8 @@
             }
         }
      }
-  }
+  },
+  "buildpacks": [
+    { "url": "heroku/nodejs" }
+  ]
 }
