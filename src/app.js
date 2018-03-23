@@ -4,6 +4,7 @@ const logger     = require('koa-logger');
 const bodyParser = require('koa-bodyparser');
 const auth       = require('./auth');
 const R          = require('ramda');
+const db         = require('./db/db-middleware');
 
 const app    = new Koa();
 const router = new Router();
@@ -16,10 +17,12 @@ router
     ctx.body = `pong ${new Date().toString()}`;
   })
   .use(auth)
-  .get('/protected', (ctx, next) => {
-    ctx.body = 'Protected';
+  .get('/protected', async (ctx, next) => {
+    const items = await ctx.app.models.Item.query()
+    ctx.body = `Protected: ${JSON.stringify(items)}`;
   });
 
+app.use(db(app));
 app.use(logger());
 app.use(bodyParser());
 app.use(router.routes());
