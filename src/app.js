@@ -18,7 +18,7 @@ router
   })
   .use(auth)
   .get('/protected', async (ctx, next) => {
-    const items = await ctx.app.models.Item.query()
+    const items = await ctx.app.models.Item.query();
     ctx.body = `Protected: ${JSON.stringify(items)}`;
   });
 
