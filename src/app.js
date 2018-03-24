@@ -14,15 +14,15 @@ router
   .get('/', (ctx, next) => {
     ctx.body = 'Hello World';
   })
-  .get('/ping', (ctx, next) => {
+  .get('*/ping', (ctx, next) => {
     ctx.body = `pong ${new Date().toString()}`;
   })
   .use(auth)
-  .get('/protected', async (ctx, next) => {
+  .get('*/protected', async (ctx, next) => {
     ctx.body = `Protected`;
   })
-  .get('/items', itemsController.getItems)
-  .post('/item', itemsController.addItem);
+  .get('*/items', itemsController.getItems)
+  .post('*/item', itemsController.addItem);
 
 app.use(db(app));
 app.use(logger());
