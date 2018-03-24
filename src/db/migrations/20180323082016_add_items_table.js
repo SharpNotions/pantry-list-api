@@ -5,7 +5,7 @@ exports.up = knex =>
     table.increments('id')
     table.string('item_name')
     table.jsonb('item_details')
-    table.timestamps()
+    table.timestamps(true, true)
     table.timestamp('deleted_at')
 })
 
