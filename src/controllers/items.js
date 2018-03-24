@@ -8,3 +8,8 @@ exports.addItem = async (ctx, next) => {
   );
   ctx.body = insertedGraph;
 };
+
+exports.getItems = async (ctx, next) => {
+  const items = await ctx.app.models.Item.query();
+  ctx.body = items;
+}

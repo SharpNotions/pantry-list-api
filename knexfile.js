@@ -4,7 +4,7 @@ const config = (nodeEnv) => ({
   client: 'pg',
   connection: {
     test       : process.env.DATABASE_URL || 'postgres://localhost/pantry_list_test',
-    development: 'postgres://localhost',
+    development: 'postgres://localhost/pantry_list',
     production : process.env.DATABASE_URL
   }[nodeEnv],
   migrations: {
