@@ -5,6 +5,7 @@ const bodyParser = require('koa-bodyparser');
 const auth       = require('./auth');
 const R          = require('ramda');
 const db         = require('./db/db-middleware');
+const itemsController = require('./controllers/items');
 
 const app    = new Koa();
 const router = new Router();
@@ -20,7 +21,8 @@ router
   .get('/protected', async (ctx, next) => {
     const items = await ctx.app.models.Item.query();
     ctx.body = `Protected: ${JSON.stringify(items)}`;
-  });
+  })
+  .post('/item', itemsController.addItem);
 
 app.use(db(app));
 app.use(logger());
