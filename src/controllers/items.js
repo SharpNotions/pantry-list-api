@@ -1,4 +1,5 @@
 const { transaction } = require('objection');
+const fetch = require('node-fetch');
 
 exports.addItem = async (ctx, next) => {
   const graph = ctx.request.body;
@@ -7,6 +8,10 @@ exports.addItem = async (ctx, next) => {
     Item.query(trx).insert(graph)
   );
   ctx.body = insertedGraph;
+  fetch('https://pantry-list-slack-bot.now.sh/item-added', {
+    method: 'POST',
+    body: JSON.stringify({ item_name: graph.item_name })
+  });
 };
 
 exports.getItems = async (ctx, next) => {
