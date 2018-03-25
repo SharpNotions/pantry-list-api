@@ -6,6 +6,7 @@ const auth       = require('./auth');
 const R          = require('ramda');
 const db         = require('./db/db-middleware');
 const itemsController = require('./controllers/items');
+const { graphql, graphiql } = require('./controllers/graphql');
 
 const app    = new Koa();
 const router = new Router();
@@ -22,7 +23,10 @@ router
     ctx.body = `Protected`;
   })
   .get('*/items', itemsController.getItems)
-  .post('*/item', itemsController.addItem);
+  .post('*/item', itemsController.addItem)
+  .get('/graphql', graphql)
+  .post('/graphql', graphql)
+  .get('/graphiql', graphiql)
 
 app.use(db(app));
 app.use(logger());

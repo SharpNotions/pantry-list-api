@@ -14,10 +14,11 @@ class Item extends Model {
         item_name: { type: 'string', minLength: 1, maxLength: 255 },
         item_details: {
           type: 'object',
-          properties: {}
+          properties: {
+            description: { type: 'string' }
+          }
         }
       }
-    };
   }
 
   static get relationMappings() {
@@ -34,6 +35,7 @@ class Item extends Model {
       }
     }
   }
+}
 }
 
 module.exports = Item;
