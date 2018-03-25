@@ -5,8 +5,11 @@ const CLIENT_ID =
 const client = new OAuth2Client(CLIENT_ID);
 
 const requireAuth = async (ctx, next) => {
-  ctx.assert(ctx.header.authorization, 401, 'No auth header found.');
-  const [_, idToken] = ctx.header.authorization.split(' ');
+  const authHeader = ctx.header.authorization;
+  const authCookie = ctx.cookies.get('id_token');
+  ctx.assert(authHeader || authCookie, 401, 'No auth found.');
+  const idToken = authHeader ? ctx.header.authorization.split(' ')[1]
+                             : authCookie;
   ctx.assert(idToken, 401, 'ID token not found');
 
   try {
