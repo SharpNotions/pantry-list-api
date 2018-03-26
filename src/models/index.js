@@ -1,5 +1,4 @@
-const Item = require('./Item')
-
 module.exports = {
-  Item
+  User: require('./User'),
+  Item: require('./Item')
 }
