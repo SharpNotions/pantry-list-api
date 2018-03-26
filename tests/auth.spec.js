@@ -41,7 +41,8 @@ describe('auth', () => {
       header: {authorization: 'Basic 123'},
       assert: () => {},
       app: {models},
-      state: {}
+      state: {},
+      cookies: {get: () => {}}
     };
   });
 
