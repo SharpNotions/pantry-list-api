@@ -4,15 +4,16 @@ const {getDbModels} = require('./helpers');
 
 jest.mock('google-auth-library');
 const googleAuthLibrary = require('google-auth-library');
+const getPayloadMock = jest.fn(() => ({
+  sub: 'sub',
+  email: 'email@com.com',
+  given_name: 'Sharp',
+  family_name: 'McNotions'
+}))
 googleAuthLibrary.OAuth2Client = function () {
     return {
       verifyIdToken: async () => ({
-        getPayload: () => ({
-          sub: 'sub',
-          email: 'email@com.com',
-          given_name: 'Sharp',
-          family_name: 'McNotions'
-        })
+        getPayload: getPayloadMock
       })
     };
 };
@@ -50,6 +51,7 @@ describe('auth', () => {
     if (ctx.body) {
       expect(ctx.body).not.toHaveProperty('errors');
     }
+    jest.clearAllMocks()
   });
 
   it('should store user in ctx.state', async () => {
@@ -81,5 +83,12 @@ describe('auth', () => {
     expect(await models.User.query()).toHaveLength(1);
     await auth(ctx, () => {});
     expect(await models.User.query()).toHaveLength(1);
+  });
+
+  it('should allow slack token to be used for auth', async () => {
+    ctx.header.authorization = 'Basic my_slack_token'
+    process.env.SLACK_TOKEN = 'my_slack_token'
+    await auth(ctx, () => {});
+    expect(getPayloadMock).toHaveBeenCalledTimes(0)
   });
 });
