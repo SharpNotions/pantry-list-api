@@ -16,6 +16,21 @@ class User extends Model {
       }
     };
   }
+
+  static get relationMappings() {
+    const UserRanking = require('./UserRanking');
+
+    return {
+      userRankings: {
+        relation: Model.HasManyRelation,
+        modelClass: UserRanking,
+        join: {
+          from: 'users.id',
+          to: 'user_rankings.user_id'
+        }
+      }
+    }
+  }
 }
 
 module.exports = User;

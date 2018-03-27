@@ -18,6 +18,21 @@ class Item extends Model {
       }
     };
   }
+
+  static get relationMappings() {
+    const UserRanking = require('./UserRanking');
+
+    return {
+      userRankings: {
+        relation: Model.HasManyRelation,
+        modelClass: UserRanking,
+        join: {
+          from: 'items.id',
+          to: 'user_rankings.item_id'
+        }
+      }
+    }
+  }
 }
 
 module.exports = Item;
