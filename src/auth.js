@@ -31,7 +31,7 @@ const requireAuth = async (ctx, next) => {
   ctx.assert(idToken, 401, 'ID token not found');
 
   if (idToken === process.env.SLACK_TOKEN) {
-    await next();
+    return await next();
   }
 
   try {
