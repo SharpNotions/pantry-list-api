@@ -5,6 +5,7 @@ class Item extends Model {
   static get tableName() {
     return 'items';
   }
+
   static get jsonSchema() {
     return {
       type: 'object',

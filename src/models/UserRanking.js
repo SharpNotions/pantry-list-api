@@ -59,7 +59,7 @@ class UserRanking extends Model {
     }
   }
 
-  moveAfter(prevId) {
+  async moveAfter(prevId) {
     // Where prevId indicates rankingA.id...
     // rankingA --> rankingC -->   ...   --> this --> rankingD
     //    becomes
@@ -70,43 +70,48 @@ class UserRanking extends Model {
     }
 
     if (prevId === this.prev_ranking_id) {
-      return this;
+      return this
+    }
+
+    const rankingA = await UserRanking.query()
+      .findOne({
+        id: prevId,
+        user_id: this.user_id
+      })
+
+    if (prevId && !rankingA) {
+      throw new Error('No such previous ranking exists.')
     }
 
     return transaction(UserRanking.knex(), async (trx) => {
-      const [rankingA] = await UserRanking.query(trx)
-        .where('id', prevId)
-        .andWhere('user_id', this.user_id)
+      const thisPrevRankingId = this.prev_ranking_id;
 
-      if (prevId && !rankingA) {
-        throw new Error('No such previous ranking exists.')
-      }
+      // Unplug this from list
+      await this.$query(trx)
+        .patch({prev_ranking_id: null})
 
-      const [rankingC] = await UserRanking.query(trx)
-        .where('prev_ranking_id', prevId)
-        .andWhere('user_id', this.user_id)
+      // Attach rankingD to this.prev_ranking_id
+      const res = await UserRanking.query(trx)
+        .patch({prev_ranking_id: thisPrevRankingId})
+        .where({
+          prev_ranking_id: this.id,
+          user_id: this.user_id
+        }).returning('*')
 
-      const [rankingD] = await UserRanking.query(trx)
-        .where('prev_ranking_id', this.id)
-        .andWhere('user_id', this.user_id)
+      // Attach rankingC to this
+      await UserRanking.query(trx)
+        .patch({prev_ranking_id: this.id})
+        .where({
+          prev_ranking_id: prevId,
+          user_id: this.user_id
+        })
+        .andWhere('id', '!=', this.id)
 
-      if (rankingD) {
-        // Unplug this from list
-        await rankingD.$query(trx)
-          .patch({prev_ranking_id: this.prev_ranking_id})
-      }
-
-      if (rankingC) {
-        // Attach rankingC to this
-        await rankingC.$query(trx)
-          .patch({prev_ranking_id: this.id})
-      }
-
-      // Plug it back in at the new location
+      // Plug this back in at the new location
       await this.$query(trx)
         .patch({prev_ranking_id: prevId})
 
-      return this;
+      return this
     })
   }
 
@@ -116,47 +121,37 @@ class UserRanking extends Model {
     // v Becomes v
     // rankingA --> rankingB --> rankingC
 
+    const rankingA = await UserRanking.query()
+      .findOne({
+        id: prevId,
+        user_id: graph.user_id
+      })
+
+    if (prevId && !rankingA) {
+      throw new Error('No such previous ranking exists.')
+    }
+
     return transaction(UserRanking.knex(), async (trx) => {
-      const [rankingA] = await UserRanking.query(trx)
-        .where('id', prevId)
-        .andWhere('user_id', graph.user_id)
-
-      if (prevId && !rankingA) {
-        throw new Error('No such previous ranking exists.')
-      }
-
-      const [rankingC] = await UserRanking.query(trx)
-        .where('prev_ranking_id', prevId)
-        .andWhere('user_id', graph.user_id)
-
-      // Plug new ranking into list
+      // Create new ranking
+      console.log(1, graph);
       const rankingB = await UserRanking.query(trx)
-        .insert({
-          ...graph,
-          prev_ranking_id: prevId
-        })
+        .insert(graph)
 
-      // Attach rankingC to this
-      if (rankingC) {
-        await rankingC.$query(trx)
-          .patch({prev_ranking_id: rankingB.id})
-      }
+      // Attach rankingC after new ranking
+      await UserRanking.query(trx)
+        .patch({prev_ranking_id: rankingB.id})
+        .where({
+          prev_ranking_id: prevId,
+          user_id: graph.user_id
+        })
+        .andWhere('id', '!=', rankingB.id)
+
+      // Plug new ranking into list after rankingA
+      await rankingB.$query(trx)
+        .patch({prev_ranking_id: prevId})
 
       return rankingB
     })
-
-    // await UserRanking.query().upsertGraph({
-    //   ...graph,
-    //   '#id': 'the-new-user_ranking'
-    //   prevRanking: {
-    //     id: prevId
-    //   },
-    //   nextRanking: {
-    //     prevRanking: {
-    //       '#ref': 'the-new-user-ranking'
-    //     }
-    //   }
-    // })
   }
 }
 

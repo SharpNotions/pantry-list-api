@@ -12,6 +12,7 @@ exports.up = knex =>
       .references('id')
       .inTable('users')
     table.integer('prev_ranking_id')
+      .unique(),
     table.timestamps(true, true)
     table.timestamp('deleted_at')
 
