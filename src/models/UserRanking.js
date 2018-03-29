@@ -61,9 +61,9 @@ class UserRanking extends Model {
 
   async moveAfter(prevId) {
     // Where prevId indicates rankingA.id...
-    // rankingA --> rankingC -->   ...   --> this --> rankingD
+    // rankingA <-- rankingC <--   ...   <-- this <-- rankingD
     //    becomes
-    // rankingA -->   this   --> rankingC --> ... --> rankingD
+    // rankingA <--   this   <-- rankingC <-- ... <-- rankingD
 
     if (prevId === this.id) {
       throw new Error("Cannot move ranking after itself")
@@ -115,7 +115,11 @@ class UserRanking extends Model {
     })
   }
 
-  deleteAndAdjustList() {
+  deleteFromList() {
+    // rankingA <--   this  <-- rankingB
+    // v Becomes v
+    // rankingA <-- rankingB
+
     return transaction(UserRanking.knex(), async (trx) => {
       const thisPrevRankingId = this.prev_ranking_id
 
@@ -137,9 +141,9 @@ class UserRanking extends Model {
 
   static async insertAfter(prevId, graph) {
     // Where prevId indicates rankingA.id...
-    // rankingA --> rankingC
+    // rankingA <-- rankingC
     // v Becomes v
-    // rankingA --> rankingB --> rankingC
+    // rankingA <-- rankingB <-- rankingC
 
     const rankingA = await UserRanking.query()
       .findOne({
