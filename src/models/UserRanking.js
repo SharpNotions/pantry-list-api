@@ -115,6 +115,26 @@ class UserRanking extends Model {
     })
   }
 
+  deleteAndAdjustList() {
+    return transaction(UserRanking.knex(), async (trx) => {
+      const thisPrevRankingId = this.prev_ranking_id
+
+      // Unplug this from list
+      await this.$query(trx)
+        .patch({prev_ranking_id: null})
+
+      await UserRanking.query(trx)
+        .patch({prev_ranking_id: thisPrevRankingId})
+        .where({
+          prev_ranking_id: this.id,
+          user_id: this.user_id
+        })
+
+      await this.$query(trx)
+        .delete()
+    })
+  }
+
   static async insertAfter(prevId, graph) {
     // Where prevId indicates rankingA.id...
     // rankingA --> rankingC
@@ -133,7 +153,6 @@ class UserRanking extends Model {
 
     return transaction(UserRanking.knex(), async (trx) => {
       // Create new ranking
-      console.log(1, graph);
       const rankingB = await UserRanking.query(trx)
         .insert(graph)
 
