@@ -24,8 +24,8 @@ router
   })
   .get('*/items', itemsController.getItems)
   .post('*/item', itemsController.addItem)
-  .get('/graphql', graphql)
-  .post('/graphql', graphql)
+  .get('*/graphql', graphql)
+  .post('*/graphql', graphql)
   .get('/graphiql', graphiql)
 
 app.use(db(app));
