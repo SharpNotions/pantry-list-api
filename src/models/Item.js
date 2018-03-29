@@ -19,11 +19,11 @@ class Item extends Model {
           }
         }
       }
+    }
   }
 
   static get relationMappings() {
     const UserRanking = require('./UserRanking');
-
     return {
       userRankings: {
         relation: Model.HasManyRelation,
@@ -35,7 +35,6 @@ class Item extends Model {
       }
     }
   }
-}
 }
 
 module.exports = Item;
