@@ -9,17 +9,13 @@ describe('hello', () => {
     db = require('../src/db/connection');
   });
 
-  afterAll(() => {
-    db.destroy();
+  afterAll(async () => {
+    await db.destroy()
   });
 
   beforeEach(async () => {
     await db.migrate.rollback();
     await db.migrate.latest();
-  });
-
-  it('should say hello', () => {
-    expect(hello()).toBe('Hello, beautiful!');
   });
 
   it('should connect to db', async () => {
