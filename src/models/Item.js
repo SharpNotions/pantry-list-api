@@ -1,4 +1,4 @@
-const Model = require('objection').Model;
+const {Model} = require('objection')
 
 class Item extends Model {
   // Table name is the only required property.
