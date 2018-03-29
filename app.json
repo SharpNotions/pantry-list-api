@@ -1,6 +1,9 @@
 {
   "name": "Pantry List API",
   "environments": {
+      "DATABASE_URL": {
+        "required": true
+      },
       "test": {
         "addons": ["heroku-postgresql:in-dyno"],
         "formation": {
