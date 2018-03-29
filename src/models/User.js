@@ -1,4 +1,4 @@
-const Model = require('objection').Model;
+const {Model} = require('objection')
 
 class User extends Model {
   static get tableName() {
@@ -15,6 +15,21 @@ class User extends Model {
         last_name : { type: 'string', minLength: 1, maxLength: 255 }
       }
     };
+  }
+
+  static get relationMappings() {
+    const UserRanking = require('./UserRanking');
+
+    return {
+      userRankings: {
+        relation: Model.HasManyRelation,
+        modelClass: UserRanking,
+        join: {
+          from: 'users.id',
+          to: 'user_rankings.user_id'
+        }
+      }
+    }
   }
 }
 
