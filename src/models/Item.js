@@ -11,18 +11,20 @@ class Item extends Model {
       type: 'object',
       required: ['item_name'],
       properties: {
+        id: { type: 'integer' },
         item_name: { type: 'string', minLength: 1, maxLength: 255 },
         item_details: {
           type: 'object',
-          properties: {}
+          properties: {
+            description: { type: 'string' }
+          }
         }
       }
-    };
+    }
   }
 
   static get relationMappings() {
     const UserRanking = require('./UserRanking');
-
     return {
       userRankings: {
         relation: Model.HasManyRelation,
