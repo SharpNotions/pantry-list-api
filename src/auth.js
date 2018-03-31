@@ -1,4 +1,5 @@
 const { OAuth2Client } = require('google-auth-library');
+const { path }  = require('ramda');
 
 const CLIENT_ID =
   '270040816063-djog7f8mpvt4m162ak4n04bjmftg1bhc.apps.googleusercontent.com';
@@ -31,6 +32,13 @@ const requireAuth = async (ctx, next) => {
   ctx.assert(idToken, 401, 'ID token not found');
 
   if (idToken === process.env.SLACK_TOKEN) {
+    const userEmail = path(['request', 'query', 'user'], ctx)
+    ctx.assert(userEmail, 401, 'User query param not present')
+
+    const [user] = await ctx.app.models.User.query().where('email', userEmail)
+    ctx.assert(user, 401, 'User email not found.')
+
+    ctx.state.user = user
     return await next();
   }
 
