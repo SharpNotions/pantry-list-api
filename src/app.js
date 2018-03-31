@@ -6,6 +6,7 @@ const auth       = require('./auth');
 const R          = require('ramda');
 const db         = require('./db/db-middleware');
 const itemsController = require('./controllers/items');
+const { getUserRankings } = require('./controllers/rankings');
 const { graphql, graphiql } = require('./controllers/graphql');
 
 const app    = new Koa();
@@ -27,6 +28,7 @@ router
   .get('*/graphql', graphql)
   .post('*/graphql', graphql)
   .get('/graphiql', graphiql)
+  .get('*/user_ranking', getUserRankings)
 
 app.use(db(app));
 app.use(logger());

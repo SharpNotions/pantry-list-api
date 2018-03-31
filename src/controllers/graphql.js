@@ -9,5 +9,6 @@ const schema = builder()
   .model(UserRanking, {listFieldName: 'userRankings', fieldName: 'userRanking'})
   .build();
 
+exports.schema = schema
 exports.graphql = graphqlKoa({ schema })
 exports.graphiql = graphiqlKoa({ endpointURL: '/graphql' })

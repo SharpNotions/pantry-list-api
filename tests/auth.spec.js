@@ -43,7 +43,8 @@ describe('auth', () => {
       assert: () => {},
       app: {models},
       state: {},
-      cookies: {get: () => {}}
+      cookies: {get: () => {}},
+      request: {}
     };
   });
 
@@ -86,7 +87,17 @@ describe('auth', () => {
   });
 
   it('should allow slack token to be used for auth', async () => {
+    ctx.assert = require('assert')
+    await models.User.query()
+      .insert({
+        auth_id    : 'sub',
+        email      : 'email@com.com',
+        first_name : 'Sharp',
+        last_name  : 'McNotions'
+      });
+
     ctx.header.authorization = 'Basic my_slack_token'
+    ctx.request.query = { user: 'email@com.com' }
     process.env.SLACK_TOKEN = 'my_slack_token'
     await auth(ctx, () => {});
     expect(getPayloadMock).toHaveBeenCalledTimes(0)
