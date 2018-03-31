@@ -27,7 +27,7 @@ const query = (depth) => {
 
 async function getUserRankings(ctx, next) {
   const depth = pathOr(10, ['request', 'query', 'depth'], ctx)
-  const { data } = await graphql(schema, query(depth), null, null, {user_id: 1})
+  const { data } = await graphql(schema, query(depth), null, null, {user_id: ctx.state.user.id})
   const flattenedUserRankings = flattenRankings(data.userRankings[0], [])
   ctx.body = flattenedUserRankings
 }
