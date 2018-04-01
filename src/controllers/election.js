@@ -71,7 +71,7 @@ const sortByVotes = (voteCounts) => (
 )
 
 
-const electWinners = (numWinners, ballots, previousWinners={}, indent='') => {
+const electWinners = (numWinners, ballots, previousWinners={}, multiplier=1, indent='') => {
   if (indent.length > 4 * 10) throw new Error();
   const log = (...msg) => console.log(indent, ...msg);
 log('-----------------------')
@@ -117,7 +117,8 @@ log('winners', winners)
 
     const nextWinnersObject = R.mergeWith(
       R.add,
-      winnersWithVoteCounts,
+      R.map(v => v * multiplier, winnersWithVoteCounts),
+      // winnersWithVoteCounts,
       previousWinners
     )
 
@@ -126,6 +127,7 @@ log('winners', winners)
       numWinners - numNewWinners,
       adjustBallots(ballots),
       nextWinnersObject,
+      multiplier * 0.9,
       indent+'----'
     )
     log('RETURNING, W', electedWinners)
@@ -140,6 +142,7 @@ log('winners', winners)
       numWinners,
       adjustBallots(ballots),
       previousWinners,
+      multiplier * 0.9,
       indent+'----'
     )
     log('RETURNING, L', electedWinners)
