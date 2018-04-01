@@ -13,7 +13,7 @@ const collectVotes = (ballots) => {
 }
 
 const getWinners = (quota, voteCounts) =>
-  R.filter(([winner, votes]) => votes >= quota, R.toPairs(voteCounts))
+  R.filter((votes) => votes >= quota, voteCounts)
 
 const getLoser = (voteCounts) => R.compose(
   R.tap(console.log),
@@ -31,13 +31,18 @@ const contains = R.curry((elem, set) => {
 })
 
 const diminishWeightBySurplus = R.curry((voteCounts, voteQuota, ballot) => {
-  const candidateVotes = voteCounts[ballot[0]]
+  const {weight, preferences} = ballot
+
+  const candidateVotes = voteCounts[String(preferences[0])]
   const surplusRatio = (candidateVotes - voteQuota) / candidateVotes
 
   if (surplusRatio < 0) {
     return ballot
   } else {
-    return {...ballot, weight: ballot[weight] * surplusRatio}
+    return {
+      ...ballot,
+      weight: weight * (surplusRatio || 0)
+    }
   }
 });
 
@@ -61,48 +66,39 @@ const adjustBallotWeights = R.curry((shouldAdjust, adjustWeight, ballots) => {
   ), ballots)
 })
 
-const sortCandidatesByVotes = R.curry((voteCounts, candidates) => (
-  R.sort(R.descend(cand => voteCounts[cand]), candidates)
-))
+const sortByVotes = (voteCounts) => (
+  R.sort(R.descend(cand => voteCounts[cand]), R.keys(voteCounts))
+)
 
 
-const electWinners = (numWinners, ballots, indent='') => {
+const electWinners = (numWinners, ballots, previousWinners={}, indent='') => {
   if (indent.length > 4 * 10) throw new Error();
   const log = (...msg) => console.log(indent, ...msg);
+log('-----------------------')
 log('numWinners', numWinners, 'ballots\n', ballots)
-  if (numWinners === 0) return [];
+log('previousWinners', previousWinners)
+  if (numWinners === 0) {
+    // const toReturn = sortByVotes(previousWinners)
+    // log('RETURNING, D', toReturn)
+    // return sortByVotes(previousWinners)
+    return previousWinners
+  }
 
   ballots = R.filter(ballot => ballot.preferences.length > 0, ballots)
 
   const voteCounts = collectVotes(ballots)
 log('voteCounts', voteCounts)
-  const candidates = R.keys(voteCounts)
-  const sortByVotes = sortCandidatesByVotes(voteCounts)
-
-//   if (candidates.length <= numWinners) {
-// log('returning short circuit', R.sort(R.descend(cand => voteCounts[cand]), candidates))
-//
-//
-//     const adjustBallots = removeCandidatesFromBallots(candidates)
-//     return [
-//       ...sortByVotes(candidates),
-//       ...electWinners(
-//         numWinners - candidates.length,
-//         adjustBallots(ballots),
-//         indent+'--'
-//       )
-//     ]
-//   }
 
   const numVotesCast = R.sum(R.values(voteCounts));
 log('numVotesCast', numVotesCast)
 
   const voteQuota = numVotesCast / numWinners // Hare
-  // const voteQuota = 1 + (numVotesCast / (numWinners + 1)) // Droop
+  // const voteQuota = (numVotesCast / (numWinners + 1)) // Droop
 log('voteQuota', voteQuota)
 
   const winnersWithVoteCounts = getWinners(voteQuota, voteCounts)
-  const winners = winnersWithVoteCounts.map(R.head)
+log('winnersWithVoteCounts', winnersWithVoteCounts)
+  const winners = R.keys(winnersWithVoteCounts)
 log('winners', winners)
   if (winners.length > 0) {
     const isWinner = contains(R.__, winners)
@@ -110,32 +106,70 @@ log('winners', winners)
     const adjustBallots = R.compose(
       removeCandidatesFromBallots(winners),
       R.map(R.ifElse(
-        isWinner,
+        R.compose(isWinner, R.head, R.prop('preferences')),
         diminishWeightBySurplus(voteCounts, voteQuota),
         R.identity
       ))
     )
 
-    return [
-      ...sortByVotes(winners),
-      ...electWinners(
-        numWinners - winners.length,
-        adjustBallots(ballots),
-        indent+'----'
-      )
-    ]
-  } else {
-    const loser = getLoser(voteCounts)
-    const adjustBallots = removeCandidatesFromBallots([loser])
+    const numNewWinners = R.difference(winners, R.keys(previousWinners)).length
+    log('winnersWithVoteCounts', winnersWithVoteCounts)
 
-    return electWinners(
-      numWinners,
+    const nextWinnersObject = R.mergeWith(
+      R.add,
+      winnersWithVoteCounts,
+      previousWinners
+    )
+
+    const electedWinners = electWinners(
+    // return electWinners(
+      numWinners - numNewWinners,
       adjustBallots(ballots),
+      nextWinnersObject,
       indent+'----'
     )
+    log('RETURNING, W', electedWinners)
+    return electedWinners
+  } else {
+    const loser = getLoser(voteCounts)
+    log('loser', loser)
+    const adjustBallots = removeCandidatesFromBallots([loser])
+
+    const electedWinners = electWinners(
+    // return electWinners(
+      numWinners,
+      adjustBallots(ballots),
+      previousWinners,
+      indent+'----'
+    )
+    log('RETURNING, L', electedWinners)
+    return electedWinners
   }
 }
 
+const fib = R.memoize(n => {
+  if (n <= 0) return 1;
+  if (n === 1) return 2;
+  else return fib(n-1) + fib(n-2)
+})
+const electWinnersByFibo = (numWinners, ballots) => {
+  const greatestBallotLength = R.compose(
+    R.reduce(R.max, -Infinity),
+    R.map(R.prop('length')),
+  )(ballots)
+
+  const idxToFibo = i => fib(greatestBallotLength - 1 - i)
+
+  const mapWithIdx = R.addIndex(R.map)
+
+  return R.compose(
+    R.reduce(R.mergeWith(R.add), {}),
+    R.flatten,
+    R.map(mapWithIdx((cand, idx) => ({
+      [cand]: idxToFibo(idx)
+    }))),
+  )(ballots)
+}
 
 
 exports.electWinners = electWinners;
@@ -171,6 +205,7 @@ exports.elect = async (ctx, next) => {
     R.identity
   )(rankings)
 
+  // electWinnersByFibo(3, R.map(x => x.preferences, ballots))
   const res = electWinners(3, ballots);
 
   // const asyncForEach = async (f, data) => {
