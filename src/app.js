@@ -5,8 +5,12 @@ const bodyParser = require('koa-bodyparser');
 const auth       = require('./auth');
 const R          = require('ramda');
 const db         = require('./db/db-middleware');
-const itemsController = require('./controllers/items');
-const { getUserRankings } = require('./controllers/rankings');
+const {
+  getItems, addItem
+} = require('./controllers/items');
+const {
+  getUserRankings, getTopRankings, createUsers
+} = require('./controllers/rankings');
 const { graphql, graphiql } = require('./controllers/graphql');
 
 const app    = new Koa();
@@ -19,16 +23,18 @@ router
   .get('*/ping', (ctx, next) => {
     ctx.body = `pong ${new Date().toString()}`;
   })
-  .use(auth)
+  // .use(auth)
   .get('*/protected', async (ctx, next) => {
     ctx.body = `Protected`;
   })
-  .get('*/items', itemsController.getItems)
-  .post('*/item', itemsController.addItem)
+  .get('*/items', getItems)
+  .post('*/item', addItem)
   .get('*/graphql', graphql)
   .post('*/graphql', graphql)
   .get('/graphiql', graphiql)
   .get('*/user_ranking', getUserRankings)
+  .get('*/top_rankings', getTopRankings)
+  .get('*/buildusers', createUsers)
 
 app.use(db(app));
 app.use(logger());
