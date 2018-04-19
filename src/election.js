@@ -290,5 +290,18 @@ const electWithFibonacci = (numWinners, allUserRankings) => {
 
 module.exports = {
   electWithSingleTransVote,
-  electWithFibonacci
+  electWithFibonacci,
+  _: {
+    fib,
+    firstPref,
+    collectVotes,
+    getLoser,
+    contains,
+    diminishWeightBySurplus,
+    removeCandidatesFromBallots,
+    voteCountsToList,
+    associateIdsWithItems,
+    singleTransferableVoteElection,
+    fibonacciElection
+  }
 }
