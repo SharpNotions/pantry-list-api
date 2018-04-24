@@ -23,7 +23,7 @@ router
   .get('*/ping', (ctx, next) => {
     ctx.body = `pong ${new Date().toString()}`;
   })
-  // .use(auth)
+  .use(auth)
   .get('*/protected', async (ctx, next) => {
     ctx.body = `Protected`;
   })
