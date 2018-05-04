@@ -93,6 +93,27 @@ async function getTopRankings(ctx, next) {
   ctx.body = res
 }
 
+async function setUserRanking(ctx, next) {
+  const {
+    params: {ranking_id},
+    request: {
+      query: {after_id}
+    }
+  } = ctx
+
+  const user_id = ctx.state.user.id
+
+  const ranking = await ctx.app.models.UserRanking.query()
+    .findOne({
+      id: ranking_id,
+      user_id: user_id
+    })
+
+  await ranking.moveAfter(+after_id)
+
+  ctx.body = ranking
+}
+
 function generateRankingsRecursive(n) {
   if (n === 1) {
     return 'nextRanking { ...RankingFields }'
@@ -151,4 +172,5 @@ async function createUsers(ctx, next) {
 exports.getUserRankings = getUserRankings
 exports.getAllUserRankings = getAllUserRankings
 exports.getTopRankings = getTopRankings
+exports.setUserRanking = setUserRanking
 exports.createUsers = createUsers
