@@ -12,7 +12,9 @@
     "pretty": "prettier --write --print-width 80 --single-quote --trailing-comma es5 --tab-width 2 'src/**/*.js' 'tests/**/*.js'",
     "create-migration": "knex migrate:make",
     "migrate": "knex migrate:latest",
-    "migrate-rollback": "knex migrate:rollback"
+    "migrate-rollback": "knex migrate:rollback",
+    "docker:migrate": "docker exec pantry-list-api_dev_1 ./node_modules/.bin/knex migrate:latest",
+    "docker:migrate-rollback": "docker exec pantry-list-api_dev_1 ./node_modules/.bin/knex migrate:rollback"
   },
   "dependencies": {
     "apollo-server-koa": "^1.3.2",
