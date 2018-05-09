@@ -7,20 +7,13 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ".:/usr/src/app"
-      - node_modules:/usr/src/app/node_modules
+      - "dev-node-modules:/usr/src/app/node_modules"
     ports:
       - "4000:4000"
-    links:
-      - pg
     environment:
       NODE_ENV: development
-    depends_on:
-      - node_modules
-
-  node_modules:
-    image: busybox
-    volumes:
-      - node_modules:/usr/src/app/node_modules
+    networks:
+      - pantry-list
 
   pg:
     image: postgres
@@ -31,6 +24,11 @@ services:
       - POSTGRES_PASSWORD=pantry_pass
     ports:
       - "5432:5432"
+    networks:
+      - pantry-list
+
+networks:
+  pantry-list:
 
 volumes:
-  node_modules:
+  dev-node-modules:
