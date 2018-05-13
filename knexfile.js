@@ -6,15 +6,20 @@ const baseConfig = {
   database: process.env.DATABASE_NAME || 'pantry'
 }
 
+// Build a connection string from a given configuration
+const getConnectionString = ({ user, password, host, database }) =>
+  `postgres://${user}:${password}@${host}/${database}`
+
 const config = (nodeEnv) => ({
   client: 'pg',
   connection: {
-    test       : {
+    test       : getConnectionString({
       ...baseConfig,
       database: 'pantry_test'
-    },
-    development: baseConfig,
-    production : baseConfig
+    }),
+    development: getConnectionString(baseConfig),
+    // Production connection string is managed by Heroku
+    production : process.env.DATABASE_URL
   }[nodeEnv],
   migrations: {
     directory: path.join(__dirname, 'src', 'db', 'migrations')
