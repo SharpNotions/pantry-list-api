@@ -12,6 +12,11 @@ services:
       - "4000:4000"
     environment:
       NODE_ENV: development
+      DATABASE_HOST: pantry-list-api_pg_1
+      DATABASE_USER: pantry_user
+      DATABASE_PASS: pantry_pass
+      DATABASE_PORT: 5432
+      DATABASE_NAME: pantry
     networks:
       - pantry-list
 
