@@ -53,6 +53,26 @@ function depthFromCtx(ctx) {
   return pathOr(10, ['request', 'query', 'depth'], ctx)
 }
 
+async function setUserRanking(ctx, next) {
+  const UserRanking = ctx.app.models.UserRanking;
+  const graph = ctx.request.body;
+  await UserRanking.query()
+    .where({ id: graph.item_id })
+    .first()
+    .then(existingRanking => {
+      if (!existingRanking) {
+        // HACK: Attach the user ID to the graph since UserRanking.insertAfter needs it.
+        graph.user_id = ctx.state.user.id;
+        return UserRanking.insertAfter(graph.prev_ranking_id, graph)
+      } else {
+        return existingRanking.moveAfter(
+          graph.prev_ranking_id
+        );
+      }
+    })
+    .then(body => ctx.body = body)
+}
+
 async function getUserRankings(ctx, next) {
   const depth = depthFromCtx(ctx)
   const { data } = await graphql(
@@ -149,6 +169,7 @@ async function createUsers(ctx, next) {
 
 
 exports.getUserRankings = getUserRankings
+exports.setUserRanking = setUserRanking
 exports.getAllUserRankings = getAllUserRankings
 exports.getTopRankings = getTopRankings
 exports.createUsers = createUsers
