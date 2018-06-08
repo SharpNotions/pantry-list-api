@@ -9,7 +9,7 @@ const {
   getItems, addItem
 } = require('./controllers/items');
 const {
-  getUserRankings, getTopRankings, createUsers
+  getUserRankings, setUserRanking, getTopRankings, createUsers
 } = require('./controllers/rankings');
 const { graphql, graphiql } = require('./controllers/graphql');
 
@@ -33,6 +33,7 @@ router
   .post('*/graphql', graphql)
   .get('/graphiql', graphiql)
   .get('*/user_ranking', getUserRankings)
+  .post('*/user_ranking', setUserRanking)
   .get('*/top_rankings', getTopRankings)
   .get('*/buildusers', createUsers)
 
