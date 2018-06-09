@@ -25,7 +25,7 @@ router
     ctx.body = 'Hello World';
   })
   .get('/handle_google_callback', (ctx, next) => {
-    ctx.assert(ctx.session.grant.response.raw.id_token, 401, 'Auth Failed')
+    ctx.assert(ctx.session.grant.response.raw, 401, 'Auth Failed')
     ctx.cookies.set('id_token', ctx.session.grant.response.raw.id_token);
     ctx.redirect(ctx.cookies.get('after_login'));
   })
