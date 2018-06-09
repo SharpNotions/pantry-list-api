@@ -20,7 +20,7 @@ module.exports = {
   production:  {
     server: {
       protocol: 'https',
-      host: 'pantry-list-api.herokuapp.com',
+      host: 'pantry-list-api-pr-23.herokuapp.com',
       transport
     },
     google: {
