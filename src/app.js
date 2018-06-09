@@ -31,7 +31,7 @@ router
   .post('*/item', addItem)
   .get('*/graphql', graphql)
   .post('*/graphql', graphql)
-  .get('/graphiql', graphiql)
+  .get('*/graphiql', graphiql)
   .get('*/user_ranking', getUserRankings)
   .post('*/user_ranking', setUserRanking)
   .get('*/top_rankings', getTopRankings)
