@@ -26,6 +26,10 @@ const getUser = async (ctx, payload) => {
 const requireAuth = async (ctx, next) => {
   const authHeader = ctx.header.authorization;
   const authCookie = ctx.cookies.get('id_token');
+  if (!authHeader && !authCookie) {
+    ctx.cookies.set('after_login',ctx.request.url);
+    return ctx.redirect(`/connect/google`);
+  }
   ctx.assert(authHeader || authCookie, 401, 'No auth found.');
   const idToken = authHeader ? ctx.header.authorization.split(' ')[1]
                              : authCookie;
