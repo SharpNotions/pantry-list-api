@@ -13,6 +13,9 @@ Server listens on port 4000.
 
 Testing: `yarn test-watch`
 
+### GraphQL
+`/graphiql` is enabled on dev and prod
+
 ## Deployments
 
 Heroku automatically:
