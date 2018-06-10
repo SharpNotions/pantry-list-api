@@ -167,9 +167,14 @@ async function createUsers(ctx, next) {
   }, R.toPairs(userRankings))
 }
 
+async function clearUserRankings(ctx, next) {
+  const userRankings = await ctx.app.models.UserRanking.query().delete();
+  ctx.body = userRankings;
+}
 
 exports.getUserRankings = getUserRankings
 exports.setUserRanking = setUserRanking
 exports.getAllUserRankings = getAllUserRankings
 exports.getTopRankings = getTopRankings
 exports.createUsers = createUsers
+exports.clearUserRankings = clearUserRankings
