@@ -13,7 +13,7 @@ const {
   getItems, addItem
 } = require('./controllers/items');
 const {
-  getUserRankings, setUserRanking, getTopRankings, createUsers
+  getUserRankings, setUserRanking, getTopRankings, createUsers, clearUserRankings
 } = require('./controllers/rankings');
 const { graphql, graphiql } = require('./controllers/graphql');
 
@@ -43,6 +43,7 @@ router
   .get('*/graphiql', graphiql)
   .get('*/user_ranking', getUserRankings)
   .post('*/user_ranking', setUserRanking)
+  .del('*/user_rankings', clearUserRankings)
   .get('*/top_rankings', getTopRankings)
   .get('*/buildusers', createUsers)
 

@@ -6,6 +6,10 @@ class UserRanking extends Model {
     return 'user_rankings'
   }
 
+  static get softDelete() {
+    return true
+  }
+
   static get jsonSchema() {
     return {
       type: 'object',

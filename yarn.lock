@@ -3102,6 +3102,10 @@ objection-graphql@^0.3.1:
   dependencies:
     lodash "^4.17.4"
 
+objection-softdelete@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/objection-softdelete/-/objection-softdelete-2.0.0.tgz#08a9041aa2fd4982f30a32968bfe454543860a3f"
+
 objection@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/objection/-/objection-1.0.1.tgz#767d4f4b3b493fc97a4de2b37f144e5c40968f00"
