@@ -79,7 +79,7 @@ class UserRanking extends Model {
         user_id: this.user_id
       })
 
-    if (rankingA.id === this.prev_ranking_id) {
+    if (rankingA && rankingA.id === this.prev_ranking_id) {
       return this
     }
 
@@ -106,14 +106,14 @@ class UserRanking extends Model {
       await UserRanking.query(trx)
         .patch({prev_ranking_id: this.id})
         .where({
-          prev_ranking_id: rankingA.id,
+          prev_ranking_id: rankingA ? rankingA.id : null,
           user_id: this.user_id
         })
         .andWhere('id', '!=', this.id)
 
       // Plug this back in at the new location
       await this.$query(trx)
-        .patch({prev_ranking_id: rankingA.id})
+        .patch({prev_ranking_id: rankingA ? rankingA.id : null})
 
       return this
     })
@@ -155,27 +155,28 @@ class UserRanking extends Model {
         user_id: graph.user_id
       })
 
-    if (prevId && !rankingA) {
-      throw new Error('No such previous ranking exists.')
-    }
-
     return transaction(UserRanking.knex(), async (trx) => {
       // Create new ranking
       const rankingB = await UserRanking.query(trx)
-        .insert(graph)
+        .insert({
+          user_id: graph.user_id,
+          item_id: graph.item_id
+        })
 
       // Attach rankingC after new ranking
       await UserRanking.query(trx)
         .patch({prev_ranking_id: rankingB.id})
         .where({
-          prev_ranking_id: rankingA.id,
+          prev_ranking_id: rankingA ? rankingA.id : null,
           user_id: graph.user_id
         })
         .andWhere('id', '!=', rankingB.id)
 
       // Plug new ranking into list after rankingA
-      await rankingB.$query(trx)
-        .patch({prev_ranking_id: rankingA.id})
+      if (rankingA) {
+        await rankingB.$query(trx)
+          .patch({prev_ranking_id: rankingA.id})
+      }
 
       return rankingB
     })
