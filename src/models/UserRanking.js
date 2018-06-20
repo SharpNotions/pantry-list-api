@@ -63,28 +63,28 @@ class UserRanking extends Model {
     }
   }
 
-  async moveAfter(prevId) {
+  async moveAfter(prevItemId) {
     // Where prevId indicates rankingA.id...
     // rankingA <-- rankingC <--   ...   <-- this <-- rankingD
     //    becomes
     // rankingA <--   this   <-- rankingC <-- ... <-- rankingD
 
-    if (prevId === this.id) {
-      throw new Error("Cannot move ranking after itself")
-    }
-
-    if (prevId === this.prev_ranking_id) {
-      return this
+    if (prevItemId === this.item_id) {
+      throw new Error("Cannot move item to be ranked after itself")
     }
 
     const rankingA = await UserRanking.query()
       .findOne({
-        id: prevId,
+        item_id: prevItemId,
         user_id: this.user_id
       })
 
-    if (prevId && !rankingA) {
-      throw new Error('No such previous ranking exists.')
+    if (rankingA.id === this.prev_ranking_id) {
+      return this
+    }
+
+    if (prevItemId && !rankingA) {
+      throw new Error(`No such previous ranking for item id ${prevItemId} exists.`)
     }
 
     return transaction(UserRanking.knex(), async (trx) => {
@@ -106,14 +106,14 @@ class UserRanking extends Model {
       await UserRanking.query(trx)
         .patch({prev_ranking_id: this.id})
         .where({
-          prev_ranking_id: prevId,
+          prev_ranking_id: rankingA.id,
           user_id: this.user_id
         })
         .andWhere('id', '!=', this.id)
 
       // Plug this back in at the new location
       await this.$query(trx)
-        .patch({prev_ranking_id: prevId})
+        .patch({prev_ranking_id: rankingA.id})
 
       return this
     })
@@ -143,7 +143,7 @@ class UserRanking extends Model {
     })
   }
 
-  static async insertAfter(prevId, graph) {
+  static async insertAfter(prevItemId, graph) {
     // Where prevId indicates rankingA.id...
     // rankingA <-- rankingC
     // v Becomes v
@@ -151,7 +151,7 @@ class UserRanking extends Model {
 
     const rankingA = await UserRanking.query()
       .findOne({
-        id: prevId,
+        item_id: prevItemId,
         user_id: graph.user_id
       })
 
@@ -168,14 +168,14 @@ class UserRanking extends Model {
       await UserRanking.query(trx)
         .patch({prev_ranking_id: rankingB.id})
         .where({
-          prev_ranking_id: prevId,
+          prev_ranking_id: rankingA.id,
           user_id: graph.user_id
         })
         .andWhere('id', '!=', rankingB.id)
 
       // Plug new ranking into list after rankingA
       await rankingB.$query(trx)
-        .patch({prev_ranking_id: prevId})
+        .patch({prev_ranking_id: rankingA.id})
 
       return rankingB
     })
