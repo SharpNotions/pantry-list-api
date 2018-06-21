@@ -57,16 +57,19 @@ async function setUserRanking(ctx, next) {
   const UserRanking = ctx.app.models.UserRanking;
   const graph = ctx.request.body;
   await UserRanking.query()
-    .where({ id: graph.item_id })
+    .where({
+      user_id: ctx.state.user.id,
+      item_id: graph.item_id
+    })
     .first()
     .then(existingRanking => {
       if (!existingRanking) {
         // HACK: Attach the user ID to the graph since UserRanking.insertAfter needs it.
         graph.user_id = ctx.state.user.id;
-        return UserRanking.insertAfter(graph.prev_ranking_id, graph)
+        return UserRanking.insertAfter(graph.prev_item_id, graph)
       } else {
         return existingRanking.moveAfter(
-          graph.prev_ranking_id
+          graph.prev_item_id
         );
       }
     })
@@ -82,7 +85,9 @@ async function getUserRankings(ctx, next) {
     null,
     {user_id: ctx.state.user.id}
   )
-  const flattenedUserRankings = flattenRankings(data.userRankings[0], [])
+  const flattenedUserRankings = data.userRankings && data.userRankings.length
+    ? flattenRankings(data.userRankings[0], [])
+    : [];
   ctx.body = flattenedUserRankings
 }
 
