@@ -85,7 +85,9 @@ async function getUserRankings(ctx, next) {
     null,
     {user_id: ctx.state.user.id}
   )
-  const flattenedUserRankings = flattenRankings(data.userRankings[0], [])
+  const flattenedUserRankings = data.userRankings && data.userRankings.length
+    ? flattenRankings(data.userRankings[0], [])
+    : [];
   ctx.body = flattenedUserRankings
 }
 
