@@ -53,6 +53,24 @@ function depthFromCtx(ctx) {
   return pathOr(10, ['request', 'query', 'depth'], ctx)
 }
 
+async function deleteUserRanking(ctx, next) {
+  const UserRanking = ctx.app.models.UserRanking;
+  const itemToDelete = await UserRanking.query()
+    .where({
+      user_id: ctx.state.user.id,
+      item_id: ctx.request.body.item_id
+    })
+    .first();
+  if (!itemToDelete) {
+    ctx.statusCode = 404;
+    ctx.message = 'Item not found';
+  } else {
+    await itemToDelete.deleteFromList();
+    ctx.statusCode = 200;
+    ctx.message = 'Item deleted';
+  }
+}
+
 async function setUserRanking(ctx, next) {
   const UserRanking = ctx.app.models.UserRanking;
   const graph = ctx.request.body;
@@ -179,6 +197,7 @@ async function clearUserRankings(ctx, next) {
 
 exports.getUserRankings = getUserRankings
 exports.setUserRanking = setUserRanking
+exports.deleteUserRanking = deleteUserRanking
 exports.getAllUserRankings = getAllUserRankings
 exports.getTopRankings = getTopRankings
 exports.createUsers = createUsers
