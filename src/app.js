@@ -10,7 +10,7 @@ const R          = require('ramda');
 const db         = require('./db/db-middleware');
 const config     = require('./config');
 const {
-  getItems, addItem
+  getUnrankedItems, addItem
 } = require('./controllers/items');
 const {
   getUserRankings, setUserRanking, getTopRankings, createUsers, clearUserRankings,
@@ -22,22 +22,26 @@ const app    = new Koa();
 const router = new Router();
 
 router
-  .get('/', (ctx, next) => {
-    ctx.body = 'Hello World';
+  .get('/', async (ctx, next) => {
+    ctx.body = 'Hello World'
+    await next()
   })
-  .get('/handle_google_callback', (ctx, next) => {
+  .get('/handle_google_callback', async (ctx, next) => {
     ctx.assert(ctx.session.grant.response.raw, 401, 'Auth Failed')
-    ctx.cookies.set('id_token', ctx.session.grant.response.raw.id_token);
-    ctx.redirect(ctx.cookies.get('after_login'));
+    ctx.cookies.set('id_token', ctx.session.grant.response.raw.id_token)
+    ctx.redirect(ctx.cookies.get('after_login'))
+    await next()
   })
-  .get('*/ping', (ctx, next) => {
+  .get('*/ping', async (ctx, next) => {
     ctx.body = `pong ${new Date().toString()}`;
+    await next()
   })
   .use(auth)
   .get('*/protected', async (ctx, next) => {
     ctx.body = `Protected`;
+    await next()
   })
-  .get('*/items', getItems)
+  .get('*/unranked_items', getUnrankedItems)
   .post('*/item', addItem)
   .get('*/graphql', graphql)
   .post('*/graphql', graphql)
