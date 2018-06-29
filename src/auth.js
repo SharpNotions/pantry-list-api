@@ -43,7 +43,7 @@ const requireAuth = async (ctx, next) => {
     ctx.assert(user, 401, 'User email not found.')
 
     ctx.state.user = user
-    return await next();
+    return await next()
   }
 
   try {
@@ -56,7 +56,7 @@ const requireAuth = async (ctx, next) => {
 
     ctx.state.user = await getUser(ctx, payload);
 
-    await next();
+    await next()
   } catch (err) {
     ctx.status = 401;
     ctx.body = {

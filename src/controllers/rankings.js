@@ -74,6 +74,8 @@ async function setUserRanking(ctx, next) {
       }
     })
     .then(body => ctx.body = body)
+
+  await next()
 }
 
 async function getUserRankings(ctx, next) {
@@ -89,6 +91,8 @@ async function getUserRankings(ctx, next) {
     ? flattenRankings(data.userRankings[0], [])
     : [];
   ctx.body = flattenedUserRankings
+
+  await next()
 }
 
 async function getAllUserRankings(ctx) {
@@ -116,6 +120,8 @@ async function getTopRankings(ctx, next) {
   }
 
   ctx.body = res
+
+  await next()
 }
 
 function generateRankingsRecursive(n) {
@@ -170,11 +176,15 @@ async function createUsers(ctx, next) {
       prevUserRankingId = newRanking.id
     }, itemIds)
   }, R.toPairs(userRankings))
+
+  await next()
 }
 
 async function clearUserRankings(ctx, next) {
   const userRankings = await ctx.app.models.UserRanking.query().delete();
   ctx.body = userRankings;
+
+  await next()
 }
 
 exports.getUserRankings = getUserRankings
