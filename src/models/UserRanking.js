@@ -7,7 +7,7 @@ class UserRanking extends Model {
   }
 
   static get softDelete() {
-    return true
+    return false
   }
 
   static get jsonSchema() {
