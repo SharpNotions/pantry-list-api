@@ -62,12 +62,10 @@ async function deleteUserRanking(ctx, next) {
     })
     .first();
   if (!itemToDelete) {
-    ctx.statusCode = 404;
-    ctx.message = 'Item not found';
+    ctx.status = 404;
   } else {
     await itemToDelete.deleteFromList();
-    ctx.statusCode = 200;
-    ctx.message = 'Item deleted';
+    ctx.status = 200;
   }
 }
 
