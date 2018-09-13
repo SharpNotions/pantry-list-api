@@ -1,5 +1,6 @@
 module.exports = {
-  User       : require('./User'),
-  Item       : require('./Item'),
-  UserRanking: require('./UserRanking')
+  User            : require('./User'),
+  Item            : require('./Item'),
+  RankingsSnapshot: require('./RankingsSnapshot'),
+  UserRanking     : require('./UserRanking')
 }

@@ -1,6 +1,7 @@
 const { graphql } = require('graphql')
 const { schema }  = require('./graphql')
 const R           = require('ramda')
+const { raw }     = require('objection')
 const {
   electWithSingleTransVote, electWithFibonacci
 } = require('../election')
@@ -49,9 +50,9 @@ const allRankingsToDepth = (depth) => {
   `
 }
 
-function depthFromCtx(ctx) {
-  return pathOr(10, ['request', 'query', 'depth'], ctx)
-}
+const depthFromCtx = pathOr(10, ['request', 'query', 'depth'])
+
+const numFromCtx = pathOr(10, ['request', 'query', 'num'])
 
 async function deleteUserRanking(ctx, next) {
   const UserRanking = ctx.app.models.UserRanking;
@@ -111,31 +112,41 @@ async function getUserRankings(ctx, next) {
   await next()
 }
 
-async function getAllUserRankings(ctx) {
-  const depth = depthFromCtx(ctx)
-
-  const { data } = await graphql(schema, allRankingsToDepth(depth), null, null)
+async function getAllUserRankings(depth) {
+  const { data } = await graphql(
+    schema,
+    allRankingsToDepth(depth), null, null)
 
   const flattenedRankings = R.map(
     head => flattenRankings(head, []),
-    data.userRankings)
+    data.userRankings
+  )
 
   return flattenedRankings
 }
 
-async function getTopRankings(ctx, next) {
-  const {num} = ctx.request.query;
-  const allRankings = await getAllUserRankings(ctx)
+async function computeTopRankings(numTopRankings, allRankings) {
+  const singleTransVoteRankings = electWithSingleTransVote(
+    numTopRankings,
+    allRankings
+  )
+  const fiboRankings = electWithFibonacci(
+    numTopRankings,
+    allRankings
+  )
 
-  const singleTransVoteRankings = electWithSingleTransVote(num, allRankings)
-  const fiboRankings = electWithFibonacci(num, allRankings)
-
-  const res = {
+  return {
     singleTransVoteRankings,
     fiboRankings
   }
+}
 
-  ctx.body = res
+async function getTopRankings(ctx, next) {
+  const num = numFromCtx(ctx)
+  const depth = depthFromCtx(ctx)
+  const allRankings = await getAllUserRankings(depth)
+
+  ctx.body = await computeTopRankings(num, allRankings)
 
   await next()
 }
@@ -197,10 +208,33 @@ async function createUsers(ctx, next) {
 }
 
 async function clearUserRankings(ctx, next) {
-  const userRankings = await ctx.app.models.UserRanking.query().delete();
-  ctx.body = userRankings;
+  await saveSnapshot(ctx);
+
+  const deletedUserRankings = await ctx.app.models.UserRanking.query().delete();
+  ctx.body = deletedUserRankings;
 
   await next()
+}
+
+async function saveSnapshot(ctx) {
+  const {
+    UserRanking, RankingsSnapshot
+  } = ctx.app.models
+
+  const num = numFromCtx(ctx)
+  const depth = depthFromCtx(ctx)
+  const allUserRankingsLists = await getAllUserRankings(depth)
+
+  const user_rankings = await UserRanking.query()
+  const top_rankings = await computeTopRankings(num, allUserRankingsLists)
+
+  await RankingsSnapshot.query()
+    .insert({
+      snapshot: {
+        user_rankings,
+        top_rankings
+      }
+    })
 }
 
 exports.getUserRankings = getUserRankings
