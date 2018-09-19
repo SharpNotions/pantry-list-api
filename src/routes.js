@@ -27,7 +27,7 @@ router
     ctx.body = `pong ${new Date().toString()}`;
     await next()
   })
-  // .use(auth)
+  .use(auth)
   .get('*/protected', async (ctx, next) => {
     ctx.body = `Protected`;
     await next()
