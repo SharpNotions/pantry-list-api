@@ -18,13 +18,16 @@ class Item extends Model {
           properties: {
             description: { type: 'string' }
           }
-        }
+        },
+        list_id: {type: 'integer'}
       }
     }
   }
 
   static get relationMappings() {
     const UserRanking = require('./UserRanking');
+    const List        = require('./List');
+
     return {
       userRankings: {
         relation: Model.HasManyRelation,
@@ -32,6 +35,14 @@ class Item extends Model {
         join: {
           from: 'items.id',
           to: 'user_rankings.item_id'
+        }
+      },
+      list: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: List,
+        join: {
+          from: 'items.list_id',
+          to: 'lists.id'
         }
       }
     }

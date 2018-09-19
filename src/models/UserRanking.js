@@ -19,6 +19,7 @@ class UserRanking extends Model {
         item_id: {type: 'integer'},
         user_id: {type: 'integer'},
         prev_ranking_id: {type: ['integer', null]},
+        list_id: {type: 'integer'},
       }
     };
   }
@@ -26,6 +27,7 @@ class UserRanking extends Model {
   static get relationMappings() {
     const Item = require('./Item');
     const User = require('./User');
+    const List = require('./List');
 
     return {
       item: {
@@ -58,6 +60,14 @@ class UserRanking extends Model {
         join: {
           from: 'user_rankings.id',
           to: 'user_rankings.prev_ranking_id'
+        }
+      },
+      list: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: List,
+        join: {
+          from: 'user_rankings.list_id',
+          to: 'lists.id'
         }
       }
     }

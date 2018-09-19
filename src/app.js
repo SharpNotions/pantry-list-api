@@ -9,6 +9,7 @@ const auth       = require('./auth');
 const R          = require('ramda');
 const db         = require('./db/db-middleware');
 const config     = require('./config');
+const router     = require('./routes');
 const {
   getUnrankedItems, addItem
 } = require('./controllers/items');
@@ -18,49 +19,17 @@ const {
 } = require('./controllers/rankings');
 const { graphql, graphiql } = require('./controllers/graphql');
 
-const app    = new Koa();
-const router = new Router();
-
-router
-  .get('/', async (ctx, next) => {
-    ctx.body = 'Hello World'
-    await next()
-  })
-  .get('/handle_google_callback', async (ctx, next) => {
-    ctx.assert(ctx.session.grant.response.raw, 401, 'Auth Failed')
-    ctx.cookies.set('id_token', ctx.session.grant.response.raw.id_token)
-    ctx.redirect(ctx.cookies.get('after_login'))
-    await next()
-  })
-  .get('*/ping', async (ctx, next) => {
-    ctx.body = `pong ${new Date().toString()}`;
-    await next()
-  })
-  .use(auth)
-  .get('*/protected', async (ctx, next) => {
-    ctx.body = `Protected`;
-    await next()
-  })
-  .get('*/unranked_items', getUnrankedItems)
-  .post('*/item', addItem)
-  .get('*/graphql', graphql)
-  .post('*/graphql', graphql)
-  .get('*/graphiql', graphiql)
-  .get('*/user_ranking', getUserRankings)
-  .post('*/user_ranking', setUserRanking)
-  .del('*/user_ranking', deleteUserRanking)
-  .del('*/all_user_rankings', clearUserRankings)
-  .get('*/top_rankings', getTopRankings)
-  .get('*/buildusers', createUsers)
-
+const app = new Koa();
 app.keys = ['grant'];
-app.use(db(app));
-app.use(logger());
-app.use(bodyParser());
-app.use(session(app));
-app.use(mount(grant(config[process.env.NODE_ENV || 'development'])));
-app.use(router.routes());
-app.use(router.allowedMethods());
+R.forEach(middleware => app.use(middleware), [
+  db(app),
+  logger(),
+  bodyParser(),
+  session(app),
+  mount(grant(config[process.env.NODE_ENV || 'development'])),
+  router.routes(),
+  router.allowedMethods()
+])
 
 const port = process.env.PORT || 4000;
 console.log(`Listening on port ${port}.`);
