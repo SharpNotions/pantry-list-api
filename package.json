@@ -13,6 +13,7 @@
     "create-migration"       : "DATABASE_HOST=localhost DATABASE_NAME=pantry_list knex migrate:make",
     "migrate"                : "DATABASE_HOST=localhost DATABASE_NAME=pantry_list knex migrate:latest",
     "migrate-rollback"       : "DATABASE_HOST=localhost DATABASE_NAME=pantry_list knex migrate:rollback",
+    "migrate-prod"           : "NODE_ENV=production PGSSLMODE=require DATABASE_URL=<Heroku -> postgres -> URI> knex migrate:latest",
     "docker:start"           : "docker-compose up",
     "docker:test"            : "docker exec pantry-list-api_dev_1 ./node_modules/.bin/jest",
     "docker:migrate"         : "docker exec pantry-list-api_dev_1 ./node_modules/.bin/knex migrate:latest",
