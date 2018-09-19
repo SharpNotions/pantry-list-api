@@ -1,11 +1,19 @@
-const { transaction } = require('objection');
-const fetch = require('node-fetch');
+const { transaction } = require('objection')
+const fetch           = require('node-fetch')
+const R               = require('ramda')
+const establishList   = require('./helpers/establishList')
 
-exports.addItem = async (ctx, next) => {
+exports.addItem = establishList(list => async (ctx, next) => {
   const graph = ctx.request.body
   const Item = ctx.app.models.Item
+
   const insertedGraph = await transaction(Item.knex(), trx =>
-    Item.query(trx).insert(graph)
+    Item.query(trx).upsertGraph({
+      ...graph,
+      list
+    }, {
+      relate: true
+    })
   )
   ctx.body = insertedGraph
   fetch('https://pantry-list-slack-bot.now.sh/item-added', {
@@ -14,22 +22,26 @@ exports.addItem = async (ctx, next) => {
   })
 
   await next()
-};
+});
 
-exports.getUnrankedItems = async (ctx, next) => {
+exports.getUnrankedItems = establishList(list => async (ctx, next) => {
   const {
     Item, UserRanking
   } = ctx.app.models
 
-  const userId = ctx.state.user.id
+  const user_id = ctx.state.user.id
+  const listNameId = R.prop('name_id', list) || null
 
   const unrankedItems = await Item.query()
-    .whereNotIn('id', UserRanking.query()
+    .skipUndefined()
+    .leftJoinRelation('list')
+    .whereNotIn('items.id', UserRanking.query()
       .select('item_id')
-      .where('user_id', userId)
+      .where({user_id})
     )
+    .andWhere('list.name_id', listNameId)
 
   ctx.body = unrankedItems
 
   await next()
-}
+})
