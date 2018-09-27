@@ -162,7 +162,8 @@ class UserRanking extends Model {
     const rankingA = await UserRanking.query()
       .findOne({
         item_id: prevItemId,
-        user_id: graph.user_id
+        user_id: graph.user_id,
+        list_id: graph.list_id
       })
 
     return transaction(UserRanking.knex(), async (trx) => {
@@ -170,7 +171,8 @@ class UserRanking extends Model {
       const rankingB = await UserRanking.query(trx)
         .insert({
           user_id: graph.user_id,
-          item_id: graph.item_id
+          item_id: graph.item_id,
+          list_id: graph.list_id
         })
 
       // Attach rankingC after new ranking
@@ -178,7 +180,8 @@ class UserRanking extends Model {
         .patch({prev_ranking_id: rankingB.id})
         .where({
           prev_ranking_id: rankingA ? rankingA.id : null,
-          user_id: graph.user_id
+          user_id: graph.user_id,
+          list_id: graph.list_id
         })
         .andWhere('id', '!=', rankingB.id)
 
