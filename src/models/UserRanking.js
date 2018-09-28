@@ -86,7 +86,8 @@ class UserRanking extends Model {
     const rankingA = await UserRanking.query()
       .findOne({
         item_id: prevItemId,
-        user_id: this.user_id
+        user_id: this.user_id,
+        list_id: this.list_id
       })
 
     if (rankingA && rankingA.id === this.prev_ranking_id) {
@@ -109,7 +110,8 @@ class UserRanking extends Model {
         .patch({prev_ranking_id: thisPrevRankingId})
         .where({
           prev_ranking_id: this.id,
-          user_id: this.user_id
+          user_id: this.user_id,
+          list_id: this.list_id
         }).returning('*')
 
       // Attach rankingC to this
@@ -117,7 +119,8 @@ class UserRanking extends Model {
         .patch({prev_ranking_id: this.id})
         .where({
           prev_ranking_id: rankingA ? rankingA.id : null,
-          user_id: this.user_id
+          user_id: this.user_id,
+          list_id: this.list_id
         })
         .andWhere('id', '!=', this.id)
 

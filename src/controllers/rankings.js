@@ -72,6 +72,7 @@ const setUserRanking = establishList(list => async (ctx, next) => {
     user_id: ctx.state.user.id,
     list_id: list.id
   }
+
   await UserRanking.query()
     .where({
       user_id: ctx.state.user.id,
@@ -109,7 +110,7 @@ const allUserRankingsForList = list => async depth => {
 
   const flattenedRankings = R.map(
     head => flattenRankings(head, []),
-    data.userRankings 
+    data.userRankings
   )
 
   return flattenedRankings
