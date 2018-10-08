@@ -9,6 +9,7 @@ const {
   deleteUserRanking,
   getAllUserRankings
 } = require('./controllers/rankings');
+const { getAllLists } = require('./controllers/lists');
 
 const router = new Router()
 
@@ -43,5 +44,6 @@ router
   .get('*/all_user_rankings', getAllUserRankings)
   .del('*/all_user_rankings', clearUserRankings)
   .get('*/top_rankings', getTopRankings)
+  .get('*/lists', getAllLists)
 
 module.exports = router
