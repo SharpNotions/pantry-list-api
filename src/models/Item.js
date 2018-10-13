@@ -16,7 +16,8 @@ class Item extends Model {
         item_details: {
           type: 'object',
           properties: {
-            description: { type: 'string' }
+            description: { type: 'string' },
+            image_url: { type: 'string' }
           }
         },
         list_id: {type: 'integer'}
