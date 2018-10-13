@@ -18,12 +18,6 @@ router
     ctx.body = 'Hello World'
     await next()
   })
-  .get('/handle_google_callback', async (ctx, next) => {
-    ctx.assert(ctx.session.grant.response.raw, 401, 'Auth Failed')
-    ctx.cookies.set('id_token', ctx.session.grant.response.raw.id_token)
-    ctx.redirect(ctx.cookies.get('after_login'))
-    await next()
-  })
   .get('*/ping', async (ctx, next) => {
     ctx.body = `pong ${new Date().toString()}`;
     await next()
@@ -37,7 +31,6 @@ router
   .post('*/item', addItem)
   .get('*/graphql', graphql)
   .post('*/graphql', graphql)
-  .get('*/graphiql', graphiql)
   .get('*/user_ranking', getUserRankings)
   .post('*/user_ranking', setUserRanking)
   .del('*/user_ranking', deleteUserRanking)
