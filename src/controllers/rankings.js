@@ -18,6 +18,7 @@ const rankingFieldsFragment = `
       item_name
       item_details {
         description
+        image_url
       }
     }
   }

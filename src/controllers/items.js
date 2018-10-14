@@ -18,7 +18,10 @@ exports.addItem = establishList(list => async (ctx, next) => {
   ctx.body = insertedGraph
   fetch('https://pantry-list-slack-bot.now.sh/item-added', {
     method: 'POST',
-    body: JSON.stringify({ item_name: graph.item_name })
+    body: JSON.stringify({
+      item_name: graph.item_name,
+      image_url: graph.item_details.image_url
+    })
   })
 
   await next()
