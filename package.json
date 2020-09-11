@@ -29,7 +29,7 @@
     "koa-bodyparser": "^4.2.0",
     "koa-logger": "^3.2.0",
     "koa-router": "^7.4.0",
-    "node-fetch": "^2.1.1",
+    "node-fetch": "^2.6.1",
     "objection": "^1.0.1",
     "objection-graphql": "^0.3.1",
     "objection-softdelete": "^2.0.0",
